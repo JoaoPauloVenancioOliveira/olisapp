@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircle
@@ -27,6 +28,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -34,6 +37,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -71,6 +76,9 @@ fun OrderTemplate() {
         )
     var productvalue by remember { mutableDoubleStateOf(0.0) }
     var showDialog by remember { mutableStateOf(false) }
+    var selectedPaymentIndex by remember { mutableStateOf(0) }
+    val paymentOptions = listOf("Dinheiro/Pix", "Cartão Débito", "Cartão Crédito")
+
 
     Scaffold { padding ->
         Column(
@@ -119,42 +127,13 @@ fun OrderTemplate() {
             Button(
                 onClick = { showDialog = true },
             ) {
-                Text("Encerrar pedido")
+                Text("Finalizar pedido")
             }
 
             if (showDialog) {
                 RadioButtonDialog(
-                    onDismiss = {showDialog = false}
-                )
+                    onDismiss = {showDialog = false}    )
             }
-
-            /*
-            if (showDialog) {
-                AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text("Deseja encerrar o pedido") },
-                    dismissButton = {
-                        Button(
-                            onClick = {
-                                showDialog = false
-                            }
-                        ) {
-                            Text("Cancelar")
-                        }
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                showDialog = false
-                            }
-                        ) {
-                            Text("Confirmar")
-                        }
-                    }
-                )
-            }
-
-             */
         }
     }
 }
