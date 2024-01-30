@@ -2,6 +2,7 @@ package com.example.olisapp.screen.order
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -121,6 +123,13 @@ fun OrderTemplate() {
             }
 
             if (showDialog) {
+                RadioButtonDialog(
+                    onDismiss = {showDialog = false}
+                )
+            }
+
+            /*
+            if (showDialog) {
                 AlertDialog(
                     onDismissRequest = { showDialog = false },
                     title = { Text("Deseja encerrar o pedido") },
@@ -128,7 +137,6 @@ fun OrderTemplate() {
                         Button(
                             onClick = {
                                 showDialog = false
-                                // Lógica adicional ao clicar em Confirmar
                             }
                         ) {
                             Text("Cancelar")
@@ -138,7 +146,6 @@ fun OrderTemplate() {
                         Button(
                             onClick = {
                                 showDialog = false
-                                // Lógica adicional ao clicar em Confirmar
                             }
                         ) {
                             Text("Confirmar")
@@ -146,8 +153,60 @@ fun OrderTemplate() {
                     }
                 )
             }
+
+             */
         }
     }
+}
+
+@Composable
+fun RadioButtonDialog(onDismiss: () -> Unit) {
+    var selectedOption by remember { mutableStateOf(Option.Option1) }
+    val options = Option.entries.toTypedArray()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Escolha a forma de pagamento") },
+        text = {
+            Column(
+                modifier = Modifier.padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                
+            ) {
+                options.forEach { option ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { selectedOption = option }
+                    ) {
+                        RadioButton(
+                            selected = selectedOption == option,
+                            onClick = { selectedOption = option  }
+                        )
+                        Text(
+                            text = option.label,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text("Confirmar")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Descartar")
+            }
+        }
+    )
+}
+
+enum class Option(val label: String) {
+    Option1("Dinheiro/Pix"),
+    Option2("Cartão de crédito"),
+    Option3("Cartão de débito")
 }
 
 @Composable
