@@ -93,18 +93,6 @@ fun Products(
 
             Row {
                 Icon(
-                    Icons.Outlined.AddCircle,
-                    contentDescription = null,
-                    tint = Color(0xFFFFA500),
-                    modifier = Modifier.clickable {
-                        onPlusClick(productValue.toDouble())
-                        quantidade++
-                    }
-                )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Icon(
                     Icons.Outlined.RemoveCircle,
                     contentDescription = null,
                     tint = Color(0xFFFFA500),
@@ -113,6 +101,18 @@ fun Products(
                             onMinusClick(productValue.toDouble())
                             quantidade--
                         }
+                    }
+                )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Icon(
+                    Icons.Outlined.AddCircle,
+                    contentDescription = null,
+                    tint = Color(0xFFFFA500),
+                    modifier = Modifier.clickable {
+                        onPlusClick(productValue.toDouble())
+                        quantidade++
                     }
                 )
             }
