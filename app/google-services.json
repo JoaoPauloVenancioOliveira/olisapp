@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1019576471407",
+    "firebase_url": "https://appolis-be963-default-rtdb.firebaseio.com",
+    "project_id": "appolis-be963",
+    "storage_bucket": "appolis-be963.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1019576471407:android:d46ee1586a06fcc7ab229a",
+        "android_client_info": {
+          "package_name": "com.example.olisapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCf_L8ruTOcIq-Fx47JgmhdJepBpFkYWMI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

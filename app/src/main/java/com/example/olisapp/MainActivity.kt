@@ -4,7 +4,14 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.ContentPaste
@@ -26,7 +33,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.example.olisapp.navigation.MainMenuNavigation
 import com.example.olisapp.ui.theme.OlisappTheme
@@ -92,7 +101,6 @@ class MainActivity : ComponentActivity() {
                                                     } else if (item.hasNews) {
                                                         Badge()
                                                     }
-
                                                 }
                                             ) {
                                                 Icon(
@@ -102,15 +110,16 @@ class MainActivity : ComponentActivity() {
                                                         item.unselectedIcon
                                                     },
                                                     contentDescription = item.title
-
                                                 )
                                             }
-                                        })
+                                        }
+                                    )
                                 }
                             }
                         }
                     ) {
-                        MainMenuNavigation(navController = navController)
+                        MainMenuNavigation(navController = navController, it)
+
                     }
                 }
             }

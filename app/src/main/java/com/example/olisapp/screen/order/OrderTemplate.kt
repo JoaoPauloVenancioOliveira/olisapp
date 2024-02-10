@@ -1,63 +1,55 @@
 package com.example.olisapp.screen.order
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AddCircle
-import androidx.compose.material.icons.outlined.RemoveCircle
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.olisapp.Product
-import com.example.olisapp.R
 import com.example.olisapp.ui.theme.OlisappTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun OrderTemplate() {
+fun OrderTemplate(paddingValues: PaddingValues) {
 
     var name by remember { mutableStateOf(TextFieldValue()) }
     val productList = listOf(
@@ -71,228 +63,200 @@ fun OrderTemplate() {
         )
     var productvalue by remember { mutableDoubleStateOf(0.0) }
     var showDialog by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf("Pix/Dinheiro") }
+    val options = listOf("Pix/Dinheiro", "Crédito", "Débito")
+    var resetScreen by remember { mutableStateOf(false) }
 
-    Scaffold { padding ->
-        Column(
+    Scaffold {
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(16.dp)
         ) {
-
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                placeholder = { Text("Digite nome do cliente") },
-            )
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(500.dp),
-                contentPadding = PaddingValues(vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+            Column(
+                modifier = Modifier.padding(paddingValues),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(productList) {
-                    Products(
-                        productName = it.productName,
-                        productValue = it.productValue,
-                        onPlusClick = { plus ->
-                            productvalue += plus
-                        },
-                        onMinusClick = { minus ->
-                            if (productvalue > 0.0) {
-                                productvalue -= minus
-                            }
-                        }
+
+                Column {
+                    Text(
+                        text = "Cliente",
+                        modifier = Modifier.padding(8.dp),
+                        color = Color.Gray
+                    )
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = name,
+                        onValueChange = { name = it },
+                        placeholder = { Text("Digite nome do cliente") },
                     )
                 }
-            }
 
-            Text(
-                text = "Valor total: R$ $productvalue",
-                style = MaterialTheme.typography.bodyMedium
-            )
-
-            Button(
-                onClick = { showDialog = true },
-            ) {
-                Text("Encerrar pedido")
-            }
-
-            if (showDialog) {
-                RadioButtonDialog(
-                    onDismiss = {showDialog = false}
-                )
-            }
-
-            /*
-            if (showDialog) {
-                AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text("Deseja encerrar o pedido") },
-                    dismissButton = {
-                        Button(
-                            onClick = {
-                                showDialog = false
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(500.dp),
+                    contentPadding = PaddingValues(vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    items(productList) {
+                        Products(
+                            productName = it.productName,
+                            productValue = it.productValue,
+                            onPlusClick = { plus ->
+                                productvalue += plus
+                            },
+                            onMinusClick = { minus ->
+                                if (productvalue > 0.0) {
+                                    productvalue -= minus
+                                }
                             }
-                        ) {
-                            Text("Cancelar")
-                        }
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                showDialog = false
-                            }
-                        ) {
-                            Text("Confirmar")
-                        }
-                    }
-                )
-            }
-
-             */
-        }
-    }
-}
-
-@Composable
-fun RadioButtonDialog(onDismiss: () -> Unit) {
-    var selectedOption by remember { mutableStateOf(Option.Option1) }
-    val options = Option.entries.toTypedArray()
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = "Escolha a forma de pagamento") },
-        text = {
-            Column(
-                modifier = Modifier.padding(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                
-            ) {
-                options.forEach { option ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.clickable { selectedOption = option }
-                    ) {
-                        RadioButton(
-                            selected = selectedOption == option,
-                            onClick = { selectedOption = option  }
-                        )
-                        Text(
-                            text = option.label,
-                            modifier = Modifier.padding(start = 8.dp)
                         )
                     }
                 }
-            }
-        },
-        confirmButton = {
-            Button(onClick = onDismiss) {
-                Text("Confirmar")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Descartar")
-            }
-        }
-    )
-}
 
-enum class Option(val label: String) {
-    Option1("Dinheiro/Pix"),
-    Option2("Cartão de crédito"),
-    Option3("Cartão de débito")
-}
-
-@Composable
-fun ItemCard() {
-    Box(
-        modifier = Modifier.padding(bottom = 10.dp)
-    ) {
-
-        Card(
-            modifier = Modifier
-                .size(width = 340.dp, height = 120.dp)
-                .padding(start = 80.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.onPrimary,
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 15.dp
-            )
-        ) {
-            Text(
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily.Default,
-                    fontWeight = FontWeight.Black
-                ),
-                text = "Batata frita + bacon",
-                textAlign = TextAlign.Justify,
-                modifier = Modifier
-                    .padding(top = 30.dp, start = 75.dp)
-            )
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 20.dp, start = 75.dp)
-            ) {
+                DropDownMenu(
+                    options = options,
+                    onOptionSelected = { selectedOption = it },
+                    selectedOption = selectedOption
+                )
 
                 Text(
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        fontFamily = FontFamily.Default,
-                    ),
-                    text = "R$ 4,00",
-                    textAlign = TextAlign.Center,
-
-                    )
-
-                Spacer(modifier = Modifier.width(40.dp))
-
-                Icon(
-                    Icons.Outlined.AddCircle,
-                    contentDescription = null,
-                    tint = Color(0xFFFFA500)
-
+                    text = "Valor total: R$ $productvalue",
+                    style = MaterialTheme.typography.bodyMedium
                 )
 
-                Spacer(modifier = Modifier.width(10.dp))
+                Button(
+                    onClick = {
+                        showDialog = true
+                    },
+                ) {
+                    Text("Encerrar pedido")
+                }
 
-                Icon(
-                    Icons.Outlined.RemoveCircle,
-                    contentDescription = null,
-                    tint = Color(0xFFFFA500)
-                )
+                if (showDialog) {
+                    ConfirmAlertDialog(
+                        showDialog = true,
+                        onConfirm = {
+                            showDialog = false
+                            resetScreen = true
+                        },
+                        onCancel = { showDialog = false })
+                }
+
+                if (resetScreen) {
+                    name = TextFieldValue("")
+                    productvalue = 0.0
+                    selectedOption = "Pix/Dinheiro"
+                    resetScreen = false
+                }
             }
-
-
         }
-        Image(
-            painter = painterResource(id = R.drawable.fried_chicken),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .size(130.dp)
-                .padding(bottom = 20.dp),
-            alignment = Alignment.CenterStart
+    }
+}
+
+@Composable
+fun ConfirmAlertDialog(
+    showDialog: Boolean,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = {
+                Text("Pedido")
+            },
+            text = {
+                Text("Deseja encerrar o pedido?")
+            },
+            confirmButton = {
+                Button(onClick = {
+                    onConfirm()
+                }) {
+                    Text("Sim")
+                }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    onCancel()
+                }) {
+                    Text("Não")
+                }
+            }
         )
     }
+}
+
+@Composable
+fun DropDownMenu(
+    options: List<String>,
+    onOptionSelected: (String) -> Unit,
+    selectedOption: String
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOptionIndex by remember { mutableIntStateOf(options.indexOf(selectedOption)) }
+
+    Column {
+        Text(
+            text = "Forma de Pagamento",
+            modifier = Modifier.padding(8.dp),
+            color = Color.Gray
+        )
+        Surface(
+            shape = RoundedCornerShape(4.dp),
+            border = BorderStroke(1.dp, Color.Black),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = { expanded = !expanded })
+            ) {
+                Text(
+                    text = selectedOption,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Alignment.CenterStart)
+                )
+
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = "Dropdown Arrow",
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Alignment.CenterEnd)
+                )
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    options.forEachIndexed { index, option ->
+                        DropdownMenuItem(
+                            onClick = {
+                                onOptionSelected(option)
+                                selectedOptionIndex = index
+                                expanded = false
+                            },
+                            text = {
+                                Text(text = option)
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 @Preview(device = "spec:width=720px,height=1280px,dpi=320", showSystemUi = true)
 @Composable
 fun OrderTemplatePreview() {
     OlisappTheme {
-        OrderTemplate()
+        OrderTemplate(paddingValues = PaddingValues())
     }
 }
 
