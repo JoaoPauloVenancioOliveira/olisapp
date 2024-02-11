@@ -33,10 +33,11 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun Products(
-    productName: String,
-    productValue: String,
+    productName: String?,
+    productValue: String?,
     onPlusClick: (Double) -> Unit,
-    onMinusClick: (Double) -> Unit
+    onMinusClick: (Double) -> Unit,
+    reset: Boolean
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -47,12 +48,16 @@ fun Products(
 
         var quantidade by remember { mutableIntStateOf(0) }
 
+        if (reset) {
+            quantidade = 0
+        }
+
         Text(
             style = TextStyle(
                 fontSize = 18.sp,
                 fontFamily = FontFamily.Default,
             ),
-            text = productName,
+            text = productName ?: "",
             modifier = Modifier
                 .padding(10.dp)
                 .padding(start = 10.dp)
@@ -99,7 +104,9 @@ fun Products(
                     tint = Color(0xFFFFA500),
                     modifier = Modifier.clickable {
                         if (quantidade > 0) {
-                            onMinusClick(productValue.toDouble())
+                            if (productValue != null) {
+                                onMinusClick(productValue.toDouble())
+                            }
                             quantidade--
                         }
                     }
@@ -112,7 +119,9 @@ fun Products(
                     contentDescription = null,
                     tint = Color(0xFFFFA500),
                     modifier = Modifier.clickable {
-                        onPlusClick(productValue.toDouble())
+                        if (productValue != null) {
+                            onPlusClick(productValue.toDouble())
+                        }
                         quantidade++
                     }
                 )

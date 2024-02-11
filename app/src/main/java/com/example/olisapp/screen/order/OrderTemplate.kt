@@ -2,13 +2,11 @@ package com.example.olisapp.screen.order
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,12 +20,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -44,115 +42,159 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.olisapp.Product
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.olisapp.ui.theme.OlisappTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun OrderTemplate(paddingValues: PaddingValues) {
+fun OrderTemplate(
+    paddingValues: PaddingValues,
+    viewModel: OrderViewModel
+) {
 
     var name by remember { mutableStateOf(TextFieldValue()) }
-    val productList = listOf(
-        Product("Batata Pequena", "15.00"),
-        Product("Batata Grande", "22.00"),
-        Product("Batata + Calabresa", "25.00"),
-        Product("Batata + Bacon", "25.00"),
-        Product("Batata com frango", "30.00"),
-        Product("Batata + frango + calabresa + bacon", "35.00"),
-
-        )
-    var productvalue by remember { mutableDoubleStateOf(0.0) }
+    var productValue by remember { mutableDoubleStateOf(0.0) }
     var showDialog by remember { mutableStateOf(false) }
+    var showNameDialog by remember { mutableStateOf(false) }
+    var showItemDialog by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf("Pix/Dinheiro") }
     val options = listOf("Pix/Dinheiro", "Crédito", "Débito")
     var resetScreen by remember { mutableStateOf(false) }
 
-    Scaffold {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(paddingValues),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+    val productsLoadingState by viewModel.productsLoadingState.collectAsStateWithLifecycle()
+
+    when (productsLoadingState) {
+        is ProductsLoadingState.Loading -> {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
             ) {
-
-                Column {
-                    Text(
-                        text = "Cliente",
-                        modifier = Modifier.padding(8.dp),
-                        color = Color.Gray
-                    )
-                    OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = name,
-                        onValueChange = { name = it },
-                        placeholder = { Text("Digite nome do cliente") },
-                    )
-                }
-
-                LazyColumn(
+                CircularProgressIndicator()
+            }
+        }
+        is ProductsLoadingState.Success -> {
+            val products = (productsLoadingState as ProductsLoadingState.Success).products
+            Scaffold {
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(500.dp),
-                    contentPadding = PaddingValues(vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp)
                 ) {
-                    items(productList) {
-                        Products(
-                            productName = it.productName,
-                            productValue = it.productValue,
-                            onPlusClick = { plus ->
-                                productvalue += plus
-                            },
-                            onMinusClick = { minus ->
-                                if (productvalue > 0.0) {
-                                    productvalue -= minus
-                                }
+                    Column(
+                        modifier = Modifier.padding(paddingValues),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+
+                        Column {
+                            Text(
+                                text = "Cliente",
+                                modifier = Modifier.padding(8.dp),
+                                color = Color.Gray
+                            )
+                            OutlinedTextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                value = name,
+                                onValueChange = { name = it },
+                                placeholder = { Text("Digite nome do cliente") },
+                            )
+                        }
+
+
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(500.dp),
+                            contentPadding = PaddingValues(vertical = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            items(products) {
+                                Products(
+                                    productName = it.name,
+                                    productValue = it.price.toString(),
+                                    onPlusClick = { plus ->
+                                        productValue += plus
+                                    },
+                                    onMinusClick = { minus ->
+                                        if (productValue > 0.0) {
+                                            productValue -= minus
+                                        }
+                                    },
+                                    reset = resetScreen
+                                )
                             }
+                        }
+
+                        DropDownMenu(
+                            options = options,
+                            onOptionSelected = { selectedOption = it },
+                            selectedOption = selectedOption
                         )
+
+                        Text(
+                            text = "Valor total: R$ $productValue",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        Button(
+                            onClick = {
+                                if (name.text.isEmpty()) {
+                                    showNameDialog = true
+                                } else if (productValue <= 0) {
+                                    showItemDialog = true
+                                } else {
+                                    showDialog = true
+                                }
+                            },
+                        ) {
+                            Text("Encerrar pedido")
+                        }
+
+                        if (showDialog) {
+                            ConfirmAlertDialog(
+                                showDialog = true,
+                                onConfirm = {
+                                    showDialog = false
+                                    resetScreen = true
+                                },
+                                onCancel = { showDialog = false })
+                        }
+
+                        if (showNameDialog) {
+                            NameValidationDialog(
+                                showDialog = true,
+                                onCancel = { showNameDialog = false }
+                            )
+                        }
+
+                        if (showItemDialog) {
+                            ItemAmountValidationDialog(
+                                showDialog = true,
+                                onCancel = { showItemDialog = false }
+                            )
+                        }
+
+                        if (resetScreen) {
+                            name = TextFieldValue("")
+                            productValue = 0.0
+                            selectedOption = "Pix/Dinheiro"
+
+                            SuccessOrder(
+                                showDialog = true,
+                                onCancel = {
+                                    showDialog = false
+                                    resetScreen = false
+                                }
+                            )
+                        }
                     }
                 }
-
-                DropDownMenu(
-                    options = options,
-                    onOptionSelected = { selectedOption = it },
-                    selectedOption = selectedOption
-                )
-
-                Text(
-                    text = "Valor total: R$ $productvalue",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Button(
-                    onClick = {
-                        showDialog = true
-                    },
-                ) {
-                    Text("Encerrar pedido")
-                }
-
-                if (showDialog) {
-                    ConfirmAlertDialog(
-                        showDialog = true,
-                        onConfirm = {
-                            showDialog = false
-                            resetScreen = true
-                        },
-                        onCancel = { showDialog = false })
-                }
-
-                if (resetScreen) {
-                    name = TextFieldValue("")
-                    productvalue = 0.0
-                    selectedOption = "Pix/Dinheiro"
-                    resetScreen = false
-                }
             }
+        }
+        is ProductsLoadingState.Error -> {
+            val errorMessage = (productsLoadingState as ProductsLoadingState.Error).errorMessage
+            Text(text = "Erro ao carregar produtos: $errorMessage")
         }
     }
 }
@@ -189,6 +231,74 @@ fun ConfirmAlertDialog(
         )
     }
 }
+
+
+@Composable
+fun NameValidationDialog(
+    onCancel: () -> Unit,
+    showDialog: Boolean,
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {},
+            text = {
+                Text("Cliente é um campo obrigatório")
+            },
+            confirmButton = {
+                Button(onClick = {
+                    onCancel()
+                }) {
+                    Text("Ok")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun ItemAmountValidationDialog(
+    onCancel: () -> Unit,
+    showDialog: Boolean,
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {},
+            text = {
+                Text("A quantidade de itens deve ser maior que zero")
+            },
+            confirmButton = {
+                Button(onClick = {
+                    onCancel()
+                }) {
+                    Text("Ok")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun SuccessOrder(
+    onCancel: () -> Unit,
+    showDialog: Boolean,
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {},
+            text = {
+                Text("Pedido feito com sucesso")
+            },
+            confirmButton = {
+                Button(onClick = {
+                    onCancel()
+                }) {
+                    Text("Ok")
+                }
+            }
+        )
+    }
+}
+
 
 @Composable
 fun DropDownMenu(
@@ -256,7 +366,7 @@ fun DropDownMenu(
 @Composable
 fun OrderTemplatePreview() {
     OlisappTheme {
-        OrderTemplate(paddingValues = PaddingValues())
+        OrderTemplate(paddingValues = PaddingValues(), OrderViewModel())
     }
 }
 
