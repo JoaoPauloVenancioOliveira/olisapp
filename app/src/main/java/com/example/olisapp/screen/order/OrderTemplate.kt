@@ -110,7 +110,7 @@ fun OrderTemplate(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             items(products) {
-                                Products(
+                                ProductCard(
                                     productName = it.name,
                                     productValue = it.price.toString(),
                                     onPlusClick = { plus ->
@@ -132,8 +132,10 @@ fun OrderTemplate(
                             selectedOption = selectedOption
                         )
 
+                        val numeroFormatado = String.format("%.2f", productValue)
+
                         Text(
-                            text = "Valor total: R$ $productValue",
+                            text = "Valor total: R$ $numeroFormatado",
                             style = MaterialTheme.typography.bodyMedium
                         )
 

@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun Products(
+fun ProductCard(
     productName: String?,
     productValue: String?,
     onPlusClick: (Double) -> Unit,

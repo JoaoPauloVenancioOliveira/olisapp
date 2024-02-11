@@ -33,7 +33,7 @@ class OrderViewModel : ViewModel() {
                         val id = productSnapshot.child("id").getValue(Long::class.java)
                         val name = productSnapshot.child("name").getValue(String::class.java)
                         val price = productSnapshot.child("price").getValue(Double::class.java)
-                        val product = Product(id = id.toString(), name = name.orEmpty(), price = price ?: 0.0)
+                        val product = Product(id = id, name = name.orEmpty(), price = price ?: 0.0)
                         products.add(product)
                     }
                     _productsLoadingState.value = ProductsLoadingState.Success(products)

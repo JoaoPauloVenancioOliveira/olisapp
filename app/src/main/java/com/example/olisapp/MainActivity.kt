@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
                             route = "summary-screen"
                         ),
                         BottomNavigationItem(
-                            title = "Faturamento",
+                            title = "Perfil",
                             selectedIcon = Icons.Filled.AttachMoney,
                             unselectedIcon = Icons.Outlined.AttachMoney,
                             hasNews = false,
